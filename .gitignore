@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+
+# Virtual environments
+.venv/
+venv/
+.bootstrap/
+
+# Local tooling
+.zencoder/
+.zenflow/
+.playwright-cli/
+.env
+.env.*
+!.env.example
+
+# Local app data
+data/*
+!data/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+
+# Local backups and temporary files
+*.bak
+*.tmp
+*.swp
+logs/
+
+# Local frontend backups
+frontend/js/app_backup.js
+frontend/js/cbt_tools_fixed.js
