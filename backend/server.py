@@ -483,12 +483,27 @@ def grounded_abstention(language: str) -> str:
 
 
 def ensure_rag_citations(content: str, context_used: list[dict], language: str) -> str:
-    """Guarantee that a grounded answer exposes only citations from retrieved context."""
-    if not context_used or any(
-        f"[KB:{item['chunk_id']}]" in content for item in context_used
+    """Add citations for retrieved knowledge chunks when the answer has none."""
+    if not context_used:
+        return content
+
+    # If the response already cites one of the retrieved chunks, leave it unchanged.
+    if any(
+        item.get("chunk_id") and f"[KB:{item['chunk_id']}]" in content
+        for item in context_used
     ):
         return content
-    return content
+
+    # Only cite chunks actually returned by retrieval and with a known source.
+    citations = " ".join(
+        f"[KB:{item['chunk_id']}] ({item['source']})"
+        for item in context_used
+        if item.get("chunk_id") and item.get("source")
+    )
+    if not citations:
+        return content
+
+    return f"{content.rstrip()} {citations}" if content.strip() else citations
 
 
 async def prepare_chat_messages(
@@ -692,9 +707,8 @@ async def chat(req: ChatRequest):
         client_events = []
         for _tool_round in range(4):
             resp = await llm_client.chat(
-    messages,
-    options=LLM_OPTIONS,
-)
+                messages, options=LLM_OPTIONS, tools=get_user_data_tools()
+            )
             tool_calls = resp.get("tool_calls", [])
             content = resp.get("content", "")
             print("DEBUG: Ollama response length:", len(content))
