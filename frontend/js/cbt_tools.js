@@ -911,9 +911,9 @@ function submitPHQ(e) {
             `;
     r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     // Save PHQ result for dashboard
-    let phqHist = JSON.parse(localStorage.getItem('phqHistory') || '[]');
+    let phqHist = getSessionHistory('phqHistory');
     phqHist.push({ score: total, level, date: new Date().toISOString() });
-    localStorage.setItem('phqHistory', JSON.stringify(phqHist));
+    saveSessionHistory('phqHistory', phqHist);
     syncTests();
 }
 
@@ -961,9 +961,9 @@ function submitGAD(e) {
                 </button>`;
     r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     // Save GAD result for dashboard
-    let gadHist = JSON.parse(localStorage.getItem('gadHistory') || '[]');
+    let gadHist = getSessionHistory('gadHistory');
     gadHist.push({ score: total, level, date: new Date().toISOString() });
-    localStorage.setItem('gadHistory', JSON.stringify(gadHist));
+    saveSessionHistory('gadHistory', gadHist);
     syncTests();
 }
 
@@ -1019,9 +1019,9 @@ function submitEsteem(e) {
                 </button>`;
     r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-    let esteemHist = JSON.parse(localStorage.getItem('esteemHistory') || '[]');
+    let esteemHist = getSessionHistory('esteemHistory');
     esteemHist.push({ score: total, level, date: new Date().toISOString() });
-    localStorage.setItem('esteemHistory', JSON.stringify(esteemHist));
+    saveSessionHistory('esteemHistory', esteemHist);
     syncTests();
 }
 
@@ -1729,9 +1729,9 @@ function renderCalendar() {
     let moodLog = JSON.parse(localStorage.getItem('moodLog') || '[]');
     let slLog = JSON.parse(localStorage.getItem('sleepLog') || '[]');
     let actLog = JSON.parse(localStorage.getItem('activities') || '[]');
-    let phqLog = JSON.parse(localStorage.getItem('phqHistory') || '[]');
-    let gadLog = JSON.parse(localStorage.getItem('gadHistory') || '[]');
-    let esteemLog = JSON.parse(localStorage.getItem('esteemHistory') || '[]');
+    let phqLog = getSessionHistory('phqHistory');
+    let gadLog = getSessionHistory('gadHistory');
+    let esteemLog = getSessionHistory('esteemHistory');
 
     // Build day map: 'YYYY-MM-DD' → {thoughts:[], sleep:[], mood:[], acts:[], tests:[]}
     let dayMap = {};
@@ -1866,9 +1866,9 @@ function calSelectDay(key, day) {
         html += `</div>`;
     }
 
-    let phqLog = JSON.parse(localStorage.getItem('phqHistory') || '[]').filter(p => getDateKey(p.date) === key);
-    let gadLog = JSON.parse(localStorage.getItem('gadHistory') || '[]').filter(g => getDateKey(g.date) === key);
-    let esteemLog = JSON.parse(localStorage.getItem('esteemHistory') || '[]').filter(t => getDateKey(t.date) === key);
+    let phqLog = getSessionHistory('phqHistory').filter(p => getDateKey(p.date) === key);
+    let gadLog = getSessionHistory('gadHistory').filter(g => getDateKey(g.date) === key);
+    let esteemLog = getSessionHistory('esteemHistory').filter(t => getDateKey(t.date) === key);
     let tests = phqLog.map(p => ({ ...p, name: 'PHQ-9' }))
         .concat(gadLog.map(g => ({ ...g, name: 'GAD-7' })))
         .concat(esteemLog.map(t => ({ ...t, name: 'Rosenberg' })));
@@ -1927,9 +1927,9 @@ async function loadInsights() {
         mood_log: JSON.parse(localStorage.getItem('moodLog') || '[]'),
         sleep_log: JSON.parse(localStorage.getItem('sleepLog') || '[]'),
         activities: JSON.parse(localStorage.getItem('activities') || '[]'),
-        phq_history: JSON.parse(localStorage.getItem('phqHistory') || '[]'),
-        gad_history: JSON.parse(localStorage.getItem('gadHistory') || '[]'),
-        esteem_history: JSON.parse(localStorage.getItem('esteemHistory') || '[]'),
+        phq_history: getSessionHistory('phqHistory'),
+        gad_history: getSessionHistory('gadHistory'),
+        esteem_history: getSessionHistory('esteemHistory'),
         thought_records: [] // will be fetched from server below if available
     };
 
@@ -1958,9 +1958,9 @@ window.loadInsights = loadInsights;
 
 function renderDashboard() {
     let moodLog = JSON.parse(localStorage.getItem('moodLog') || '[]');
-    let phqHist = JSON.parse(localStorage.getItem('phqHistory') || '[]');
-    let gadHist = JSON.parse(localStorage.getItem('gadHistory') || '[]');
-    let esteemHist = JSON.parse(localStorage.getItem('esteemHistory') || '[]');
+    let phqHist = getSessionHistory('phqHistory');
+    let gadHist = getSessionHistory('gadHistory');
+    let esteemHist = getSessionHistory('esteemHistory');
     let sl = JSON.parse(localStorage.getItem('sleepLog') || '[]');
     let acts = JSON.parse(localStorage.getItem('activities') || '[]');
 

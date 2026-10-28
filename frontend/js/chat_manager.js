@@ -54,7 +54,12 @@ async function sendMessage() {
                 ? data.response.trim()
                 : 'I could not generate a response. Please try again.';
 
-        addMsg('assistant', responseText);
+        // Hide internal knowledge-base citations in the visible chat.
+        const displayText = responseText
+            .replace(/\s*\[KB:chunk_[^\]]+\]\s*\([^)]*\)/g, '')
+            .trim();
+
+        addMsg('assistant', displayText);
 
         // Keep knowledge-source details out of the normal chat interface.
         if (Array.isArray(data.client_events)) {
@@ -170,4 +175,76 @@ function addMsg(role, content, id = '') {
     }
 
     list.scrollTop = list.scrollHeight;
+}
+
+function startNewChat() {
+    if (isProc) {
+        alert('Please wait for the current response to finish.');
+        return;
+    }
+
+    if (!confirm(
+        'Start a new conversation? Your existing conversation will be preserved.'
+    )) {
+        return;
+    }
+
+    if (typeof createNewSession !== 'function') {
+        alert('New session support is not loaded. Please refresh the page.');
+        return;
+    }
+
+    // Create the new session before clearing the visible conversation.
+    try {
+        createNewSession();
+    } catch (error) {
+        console.error('Could not start a new session:', error);
+        alert('Could not start a new conversation. Your current chat is unchanged.');
+        return;
+    }
+
+    const messages = document.getElementById('messages');
+    if (messages) {
+        messages.innerHTML = '';
+    }
+
+    const input = document.getElementById('msgInput');
+    if (input) {
+        input.value = '';
+        input.style.height = 'auto';
+    }
+
+    document.getElementById('mainContainer')?.classList.add('empty-state');
+
+    const welcome = document.createElement('div');
+    welcome.id = 'welcome';
+    welcome.style.cssText =
+        'display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:60px 0 32px; text-align:center;';
+
+    welcome.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+            <i data-lucide="sparkles"
+               style="width:32px; height:32px; color:var(--accent);"></i>
+            <h1 id="welcomeText"
+                style="font-family:Georgia, 'Times New Roman', serif; font-size:30px; font-weight:normal; color:var(--text); letter-spacing:-0.5px;">
+                Good afternoon
+            </h1>
+        </div>`;
+
+    if (messages) {
+        messages.prepend(welcome);
+    }
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+
+    if (window.updateWelcomeMsg) {
+        window.updateWelcomeMsg();
+    }
+
+    // Initialize empty assessment histories for this new session.
+    if (typeof syncTests === 'function') {
+        syncTests();
+    }
 }

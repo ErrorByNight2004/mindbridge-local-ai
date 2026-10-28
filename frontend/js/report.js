@@ -14,8 +14,8 @@ async function downloadAsPDF() {
     const moodLog = JSON.parse(localStorage.getItem('moodLog') || '[]');
     const sleepLog = JSON.parse(localStorage.getItem('sleepLog') || '[]');
     const activities = JSON.parse(localStorage.getItem('activities') || '[]');
-    const phqHist = JSON.parse(localStorage.getItem('phqHistory') || '[]');
-    const gadHist = JSON.parse(localStorage.getItem('gadHistory') || '[]');
+    const phqHist = getSessionHistory('phqHistory');
+    const gadHist = getSessionHistory('gadHistory');
 
     let thoughts = [];
     try {
