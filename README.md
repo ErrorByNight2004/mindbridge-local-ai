@@ -2,42 +2,111 @@
 
 MindBridge is a local-first mental wellness application that combines CBT-inspired self-reflection, journaling, mood and sleep tracking, and conversational AI powered by Ollama.
 
-This repository contains my modifications to the original MindBridge/CBT assistant project. The goal is to maintain a practical local application while improving its configuration, model integration, documentation, and development workflow.
+This repository contains my modifications to an existing CBT assistant project. The work focuses on improving the local application experience, model configuration, data handling, documentation, and quality-assurance workflow.
+
+## Project Overview
+
+MindBridge explores how conversational AI and structured self-reflection tools can be brought together in a locally run wellness application.
+
+Alongside application development, this project includes a data-quality and product analytics audit examining how user records are stored, associated with sessions, and retained across application use.
 
 ## Maintainer
 
 **Nishanth S Reddy**
 
-- GitHub: https://github.com/ErrorByNight2004
+- GitHub: [ErrorByNight2004](https://github.com/ErrorByNight2004)
+- Project Repository: [mindbridge-local-ai](https://github.com/ErrorByNight2004/mindbridge-local-ai)
 
-## Features
+## Key Features
 
-Depending on the components enabled in your checkout, MindBridge includes:
-
+- **AI Chat Assistant:** Conversational support using a locally running Ollama model.
 - **Thought Diary:** Record situations, automatic thoughts, emotions, and alternative perspectives.
-- **Mood and Sleep Tracking:** Record daily mood and sleep information.
-- **Self-Reflection Exercises:** Use structured CBT-inspired exercises to examine thought patterns.
-- **AI Chat Assistant:** Have supportive conversations with a locally running Ollama model.
-- **Knowledge Retrieval:** Retrieve relevant material from a local knowledge base when the retrieval system is available.
-- **Personal Records:** Store supported journal entries and conversation history locally.
+- **Mood Tracking:** Record mood scores and review available progress information.
+- **Sleep Journal:** Record sleep and wake times, sleep quality, and interruptions.
+- **CBT-Inspired Exercises:** Use structured self-reflection techniques to examine thought patterns.
+- **Knowledge Retrieval:** Retrieve relevant information from the local knowledge base when retrieval is enabled.
+- **Assessment History:** Store supported assessment results and associate records with sessions.
 
-## Requirements
+## Technology Stack
 
-- Windows, macOS, or Linux, depending on the available launch scripts.
-- Python and the dependencies specified by `requirements.txt`.
-- Ollama installed and running.
-- Sufficient RAM and disk space for the selected language model and embedding model.
+| Area | Technology |
+|---|---|
+| AI inference | Ollama |
+| Language model | Qwen 3.5 4B |
+| Backend | Python, FastAPI |
+| Frontend | HTML, CSS, JavaScript |
+| Data storage | SQLite |
+| Knowledge retrieval | Local knowledge base and retrieval components |
 
-## Installation
+## Application Preview
 
-Clone your own repository:
+![MindBridge application screenshot](docs/img/screenshot.png)
+
+## Data Quality and Validation
+
+A practical data-quality audit was conducted using the application's SQLite database and functional UI tests.
+
+The audit covered message records, session references, mood logs, thought records, sleep logs, activities, and assessment results.
+
+### Audit Snapshot
+
+| Validation Area | Observed Result | Status |
+|---|---:|---|
+| Messages | 96 records across 6 sessions | Pass |
+| Messages with missing session IDs | 0 | Pass |
+| Orphaned session references in checked tables | 0 | Pass |
+| Mood records | 1 record | Partial |
+| Thought diary records | 1 record | Partial |
+| Sleep journal records | 1 record | Partial |
+| Assessment records | 2 records | Partial |
+| Activity records | 0 records | Not tested |
+
+**Important:** These results describe the database snapshot used for the audit. Partial results indicate that record creation or basic persistence was observed, but complete synchronization and session-isolation behavior were not fully verified.
+
+### Key Observations
+
+- Message records had valid session references in the audited snapshot.
+- Thought diary and sleep journal entries remained visible after refreshing the application.
+- The mood score was stored as 10 in the database, while the calendar displayed it as `10/5`. This is a potential presentation or mapping issue requiring further investigation.
+- Cross-session access isolation and complete-list synchronization require additional testing.
+- No activity records were present in the audited database snapshot.
+
+## Portfolio and Project Documentation
+
+The project includes supporting materials documenting the data-quality audit and product analytics work.
+
+| Deliverable | Description |
+|---|---|
+| [Product Analytics Case Study](docs/portfolio/MindBridge_Data_Quality_Product_Analytics_Case_Study.docx) | Project analysis, audit findings, and improvement recommendations |
+| [Data Quality Audit Workbook](docs/portfolio/MindBridge_Data_Audit.xlsx) | Data dictionary, initial audit, and validation checklist |
+| [Audit Infographic](docs/portfolio/MindBridge%20Data%20Quality%20Audit%20Infographic.png) | Visual summary of the data-quality audit |
+
+Additional technical documentation:
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Development Guide](docs/DEVELOPMENT.md)
+- [Privacy and Safety](docs/PRIVACY_AND_SAFETY.md)
+
+## Installation and Setup
+
+### Requirements
+
+- Python
+- Ollama
+- Git
+- Dependencies listed in `requirements.txt`
+- Sufficient RAM and disk space for the selected language and embedding models
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/ErrorByNight2004/YOUR-REPOSITORY.git
-cd YOUR-REPOSITORY
+git clone https://github.com/ErrorByNight2004/mindbridge-local-ai.git
+cd mindbridge-local-ai
 ```
 
-Create and activate a Python virtual environment on Windows:
+### 2. Create a Virtual Environment
+
+On Windows PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -45,48 +114,69 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Pull the Qwen model configured for the current application:
+### 3. Start Ollama and Pull the Configured Model
 
 ```bash
 ollama pull qwen3.5:4b
 ```
 
-Start the backend from the project root:
+Ensure Ollama is running before starting the application.
+
+### 4. Start the Backend
+
+From the project root:
 
 ```bash
 python -m uvicorn backend.server:app --host 127.0.0.1 --port 8000
 ```
 
-Then open:
+### 5. Open the Application
 
-http://127.0.0.1:8000
+Visit:
 
-If your checkout includes a supported launcher, you may use it instead after verifying its model and environment settings.
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ## Configuration
 
-The model settings are defined in `config/model_config.yaml`. The application also supports persisted model selection through its settings mechanism.
+Model settings are maintained in:
 
-Review the selected model, generation parameters, and local data directories before running the application.
+```text
+config/model_config.yaml
+```
+
+Review the configured model, generation parameters, and local data directories before running the application.
+
+## Limitations and Future Improvements
+
+The following areas have been identified for further development and validation:
+
+- Complete session-isolation testing across all user-record types.
+- Consistent synchronization and retrieval of journal and activity records.
+- Investigation of the mood score display discrepancy.
+- Improved traceability of knowledge-base citations.
+- Additional validation of data persistence and error handling.
+- Clearer privacy controls and documentation for optional external integrations.
 
 ## Privacy and Safety
 
 MindBridge is intended for self-reflection and general wellness support. It is not a therapist, medical device, emergency service, or substitute for professional mental health care.
 
-Local model inference does not automatically mean every feature is offline. Optional voice, media, or other integrations may use external services. Review the application's configuration and privacy documentation before using sensitive information.
+Local model inference does not automatically mean every feature operates offline. Optional voice, media, or other integrations may use external services. Review the application's configuration and privacy documentation before entering sensitive information.
 
-Do not expose the local server to untrusted networks without first addressing authentication, CORS, and other security requirements.
+Do not expose the local server to untrusted networks without addressing authentication, CORS, and other security requirements.
+
+For more information, see [Privacy and Safety](docs/PRIVACY_AND_SAFETY.md).
 
 ## Development and Contributions
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and contribution guidance.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance.
 
-Please report security vulnerabilities using the process in [SECURITY.md](SECURITY.md), rather than public issues.
+Please report security vulnerabilities through the process described in [SECURITY.md](SECURITY.md), rather than through public issues.
 
 ## Original Project and License
 
-This repository is based on an existing project originally attributed to KazKozDev. The original MIT License and required copyright notices must be preserved.
+This repository is based on an existing project originally attributed to **KazKozDev**.
 
-My changes are documented as modifications to that project; original authorship and third-party attributions remain acknowledged.
+The original MIT License and required copyright notices must be preserved. My work represents modifications to the original project; original authorship and third-party attributions remain acknowledged.
 
 See [LICENSE](LICENSE) for the applicable license terms.
